@@ -4,6 +4,7 @@ from model import XGAN
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from datetime import datetime
+from random import randrange
 import os
 
 # ------------------------------------------------
@@ -43,8 +44,8 @@ dataset = dataset_obj.dataset_numpy
 class DisplayImages(tf.keras.callbacks.Callback):
 
   def on_epoch_end(self, epoch, logs=None):
-    image_batch = dataset[0]
-    result = xgan.generator(image_batch, is_cartoon = False, training=False)
+    image_batch_real = dataset[0]
+    result = xgan.generator(image_batch_real, is_cartoon = False, training=False)
     cartoon = result['image_a']
     real = result['image_b']
 
@@ -52,7 +53,7 @@ class DisplayImages(tf.keras.callbacks.Callback):
     # real images
     for i in range(16):
         fig.add_subplot(8, 4, i+1)
-        img = image_batch[i-16, :, :, :] * 127.5 + 127.5
+        img = image_batch_real[i-16, :, :, :] * 127.5 + 127.5
         plt.imshow(img.astype("uint8"))
         plt.axis('off')
     # cartoon images predicted
@@ -63,8 +64,28 @@ class DisplayImages(tf.keras.callbacks.Callback):
         plt.axis('off')
 
     plt.savefig(results_folder_name + '/' + 'image_at_epoch_{:04d}.png'.format(epoch))
-    
 
+    if epoch % 50 == 0:
+        n = len(dataset)
+        random = randrange(n)
+        batch = dataset[random]
+        result = xgan.generator(batch, is_cartoon = False, training=False)
+        cartoon = result['image_a']
+        fig = plt.figure(figsize=(6,12))
+    # real images
+    for i in range(16):
+        fig.add_subplot(8, 4, i+1)
+        img = batch[i-16, :, :, :] * 127.5 + 127.5
+        plt.imshow(img.astype("uint8"))
+        plt.axis('off')
+    # cartoon images predicted
+    for i in range(16, 32):
+        fig.add_subplot(8, 4, i+1)
+        img_prediction = cartoon[i-16, :, :, :] * 127.5 + 127.5
+        plt.imshow(img_prediction.numpy().astype("uint8"))
+        plt.axis('off')
+
+    plt.savefig(results_folder_name + '/' + 'CHECK_{:04d}.png'.format(epoch))
 
 # ------------------------------------------------
 # --------------------TRAIN-----------------------
