@@ -44,7 +44,7 @@ print(dataset.shape)
 class DisplayImages(tf.keras.callbacks.Callback):
 
   def on_epoch_end(self, epoch, logs=None):
-    img_reals_dataset = dataset[0,0:16,:,:,:]
+    img_reals_dataset = dataset[0,0:batch_size,:,:,:]
     image_batch_real = img_reals_dataset
     result = xgan.generator(image_batch_real, is_cartoon = False, training=False)
     cartoon = result['image_a']
@@ -79,7 +79,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
 # --------------------TRAIN-----------------------
 # ------------------------------------------------
 
-xgan = XGAN()
+xgan = XGAN(batch_size=batch_size)
 xgan.compile(
     d_optimizer=tf.keras.optimizers.Adam(learning_rate=lr, beta_1=betas[0], beta_2=betas[1]),
     g_optimizer=tf.keras.optimizers.Adam(learning_rate=lr, beta_1=betas[0], beta_2=betas[1]),
