@@ -44,7 +44,8 @@ print(dataset.shape)
 class DisplayImages(tf.keras.callbacks.Callback):
 
   def on_epoch_end(self, epoch, logs=None):
-    image_batch_real = dataset[0]
+    img_reals_dataset = dataset[0,0:16,:,:,:]
+    image_batch_real = img_reals_dataset
     result = xgan.generator(image_batch_real, is_cartoon = False, training=False)
     cartoon = result['image_a']
     real = result['image_b']
@@ -85,4 +86,4 @@ xgan.compile(
     loss=tf.keras.losses.BinaryCrossentropy(from_logits=True)
 )
 
-xgan.fit(dataset, epochs=num_epochs, callbacks=[DisplayImages(), cp_callback])
+xgan.fit(dataset, epochs=num_epochs, callbacks=[DisplayImages()])
