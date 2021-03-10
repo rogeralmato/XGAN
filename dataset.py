@@ -25,7 +25,7 @@ class Dataset():
             batch_size=batch_size,
             label_mode=None,
             shuffle=True
-        ).map(self.preprocessing_image)
+        )
         self.training_face = self.training_face.map(self.preprocessing_image)
 
         self.dataset_numpy = self.join_datasets_to_numpy()

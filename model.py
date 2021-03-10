@@ -350,7 +350,9 @@ class XGAN(tf.keras.Model):
     # From real faces
     result = self.generator(generator_result_from_real['image_a'], is_cartoon = True)
     from_real_semantic_loss =  tf.reduce_mean(tf.abs(result['embedding'] - generator_result_from_real['embedding']))
-    return from_real_semantic_loss
+    result = self.generator(generator_result_from_cartoon['image_b'], is_cartoon = False)
+    from_cartoon_semantic_loss = tf.reduce_mean(tf.abs(result['embedding'] - generator_result_from_cartoon['embedding']))
+    return from_real_semantic_loss + from_cartoon_semantic_loss
 
   def domain_adversarial_loss(self, cartoon_from_cartoon_dataset, real_from_real_dataset):
     cdann_cartoon = self.cdann(cartoon_from_cartoon_dataset['embedding'])
