@@ -309,11 +309,12 @@ class XGAN(tf.keras.Model):
   tf.keras.Model Object
   """
 
-  def __init__(self):
+  def __init__(self, batch_size=16):
     super(XGAN, self).__init__()
     self.discriminator = Discriminator()
     self.generator = Generator()
     self.cdann = Cdann()
+    self.batch_size = batch_size
   
   def abs_criterion(self, in_, target):
     return tf.reduce_mean(tf.abs(in_ - target))
@@ -375,8 +376,10 @@ class XGAN(tf.keras.Model):
     return real_loss + fake_loss
 
   def train_step(self, dataset):
-    img_cartoon_dataset = dataset[1]
-    img_reals_dataset = dataset[0]
+    img_cartoon_dataset = dataset[:,self.batch_size:,:,:,:]
+    img_reals_dataset = dataset[:,0:self.batch_size,:,:,:]
+    img_cartoon_dataset = img_cartoon_dataset[0]
+    img_reals_dataset = img_reals_dataset[0]
 
     with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
       generator_result_from_real = self.generator(img_reals_dataset, is_cartoon = False) # image_a (carton from real), image_b(real from real)

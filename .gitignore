@@ -33,7 +33,7 @@ MANIFEST
 *.spec
 
 # RESULTS
-RESULTS/*
+RESULTS/**
 
 .vscode/*
 

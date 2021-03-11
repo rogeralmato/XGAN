@@ -25,7 +25,7 @@ class Dataset():
             batch_size=batch_size,
             label_mode=None,
             shuffle=True
-        ).map(self.preprocessing_image)
+        )
         self.training_face = self.training_face.map(self.preprocessing_image)
 
         self.dataset_numpy = self.join_datasets_to_numpy()
@@ -51,7 +51,8 @@ class Dataset():
             cartoon_batch = cartoon_iterator.next()
             # print(f"{len(real_batch)} - {len(cartoon_batch)}")
             if data is None:
-                data= np.array([real_batch, cartoon_batch])
+                data = np.array([np.concatenate((real_batch, cartoon_batch))])
+
             else:
                 n_cartoon = len(cartoon_batch)
                 n_real = len(real_batch)
@@ -62,5 +63,5 @@ class Dataset():
                     # data = np.vstack((data, np.array([real_batch[:n], cartoon_batch[:n]])))
                     continue
                 else:
-                    data = np.vstack((data, np.array([real_batch, cartoon_batch])))
+                    data = np.vstack((data, [np.array(np.concatenate((real_batch, cartoon_batch)))]))
         return data
