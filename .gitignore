@@ -141,3 +141,13 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+#Idea files
+.idea
+
+# Trained model, logs and sample images
+checkpoint/
+logs/
+sample/
+desktop.ini
+XGAN-v2/datasets/
