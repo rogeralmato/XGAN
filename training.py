@@ -25,7 +25,7 @@ REAL_DATASET_PATH = "dataset_real"
 
 
 now = datetime.now()
-results_folder_name = f"RESULTS/{now.day}-{now.month}-{now.year}_{now.hour}:{now.minute}:{now.second}"
+results_folder_name = f"RESULTS/{now.day}-{now.month}-{now.year}_{now.hour}_{now.minute}_{now.second}"
 os.mkdir(str(os.getcwd()) + '/' + results_folder_name)
 os.mkdir(str(os.getcwd()) + '/' + results_folder_name + '/checkpoints')
 

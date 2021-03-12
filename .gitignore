@@ -145,7 +145,7 @@ cython_debug/
 #Idea files
 .idea
 
-# Trained model, logs and sample images
+# Trained model, logs, sample images and dataset from the XGAN-v2
 checkpoint/
 logs/
 sample/

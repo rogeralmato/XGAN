@@ -4,13 +4,11 @@ Some codes from https://github.com/Newmu/dcgan_code
 from __future__ import division
 
 import skimage
-from PIL import Image
 from skimage.transform import resize
-
+from skimage import io
 
 import math
 import pprint
-import imageio
 import numpy as np
 import copy
 
@@ -98,11 +96,8 @@ def save_images(images, size, image_path):
 
 
 def imread(path, is_grayscale=False):
-    if (is_grayscale):
-        return imageio.imread(path, flatten=True).astype(np.float)
-    else:
-        #return _imread(path, mode='RGB').astype(np.float)
-        return imageio.imread(path, pilmode='RGB').astype(np.float)
+    return io.imread(path, as_gray=is_grayscale).dtype
+    dtype('uint8')
 
 
 def merge_images(images, size):
@@ -121,6 +116,7 @@ def merge(images, size):
 
 
 def imsave(images, size, path):
+    return io.imsave(path)
     return imageio.imwrite(path, merge(images, size))
 
 
@@ -131,8 +127,9 @@ def center_crop(x, crop_h, crop_w,
     h, w = x.shape[:2]
     j = int(round((h - crop_h) / 2.))
     i = int(round((w - crop_w) / 2.))
-    return scipy.misc.imresize(
-        x[j:j + crop_h, i:i + crop_w], [resize_h, resize_w])
+    skimage.transform.resize(
+        x[j:j + crop_h, i:i + crop_w],
+        [resize_h, resize_w])
 
 
 def transform(image, npx=64, is_crop=True, resize_w=64):
