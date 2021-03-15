@@ -78,6 +78,8 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
 # ------------------------------------------------
 # --------------------TRAIN-----------------------
 # ------------------------------------------------
+logdir = "logs2/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir, histogram_freq=1)
 
 xgan = XGAN(batch_size=batch_size)
 xgan.compile(
@@ -86,4 +88,4 @@ xgan.compile(
     loss=tf.keras.losses.BinaryCrossentropy(from_logits=True)
 )
 
-xgan.fit(dataset, epochs=num_epochs, callbacks=[DisplayImages()])
+xgan.fit(dataset, epochs=num_epochs, callbacks=[DisplayImages(), tensorboard_callback])

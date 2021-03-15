@@ -366,7 +366,7 @@ class XGAN(tf.keras.Model):
     autoencoder_loss = self.autoencoder_loss(img_cartoon_dataset, img_reals_dataset, generator_result_from_cartoon['image_a'], generator_result_from_real['image_b'])
     semantic_loss = self.semantic_consistency_feedback_loss(generator_result_from_cartoon, generator_result_from_real)
     domain_adversarial_loss = self.domain_adversarial_loss(generator_result_from_cartoon, generator_result_from_real)
-    return autoencoder_loss + semantic_loss + domain_adversarial_loss
+    return autoencoder_loss, semantic_loss, domain_adversarial_loss
 
   def discriminator_loss(self, generator_result_from_real, img_cartoon_dataset):
     real_output = self.discriminator(img_cartoon_dataset)
@@ -389,12 +389,13 @@ class XGAN(tf.keras.Model):
       disc_loss = self.discriminator_loss(generator_result_from_real, img_cartoon_dataset)
 
       # Generator
-      gen_loss = self.generator_loss(img_cartoon_dataset, img_reals_dataset, generator_result_from_real, generator_result_from_cartoon)
+      autoencoder_loss, semantic_loss, domain_adversarial_loss = self.generator_loss(img_cartoon_dataset, img_reals_dataset, generator_result_from_real, generator_result_from_cartoon)
+      gen_loss = autoencoder_loss + semantic_loss + domain_adversarial_loss
       
       gradients_of_generator = gen_tape.gradient(gen_loss, self.generator.trainable_variables)
       gradients_of_discriminator = disc_tape.gradient(disc_loss, self.discriminator.trainable_variables)
       self.g_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
       self.d_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.trainable_variables))
       
-      return {"Discriminator loss": disc_loss, "Generator loss": gen_loss}
+      return {"Discriminator loss": disc_loss, "Generator loss": gen_loss, 'autoencoder_loss': autoencoder_loss, 'semantic_loss':semantic_loss, 'domain_adversarial_loss':domain_adversarial_loss}
 
