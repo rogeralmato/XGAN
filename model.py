@@ -317,8 +317,11 @@ class XGAN(tf.keras.Model):
     self.cdann = Cdann()
     self.batch_size = batch_size
 
-    self.train_loss = tf.keras.metrics.Mean('train_loss', dtype=tf.float32)
-    self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy('train_accuracy')
+    self.gen_loss_metric = tf.keras.metrics.Mean('gen_loss_metric', dtype=tf.float32)
+    self.disc_loss_metric = tf.keras.metrics.Mean('disc_loss_metric', dtype=tf.float32)
+    self.autoencoder_loss_metric = tf.keras.metrics.Mean('autoencoder_loss_metric', dtype=tf.float32)
+    self.semantic_loss_metric = tf.keras.metrics.Mean('semantic_loss_metric', dtype=tf.float32)
+    self.domain_adversarial_loss_metric = tf.keras.metrics.Mean('domain_adversarial_loss_metric', dtype=tf.float32)
     self.epoch_step = 0
     train_log_dir = 'logs/' + datetime.now().strftime("%Y%m%d-%H%M%S") + '/train'
     self.train_summary_writer = tf.summary.create_file_writer(train_log_dir)
@@ -374,6 +377,10 @@ class XGAN(tf.keras.Model):
     semantic_loss = self.semantic_consistency_feedback_loss(generator_result_from_cartoon, generator_result_from_real)
     domain_adversarial_loss = self.domain_adversarial_loss(generator_result_from_cartoon, generator_result_from_real)
 
+    self.autoencoder_loss_metric(autoencoder_loss)
+    self.semantic_loss_metric(semantic_loss)
+    self.domain_adversarial_loss_metric(domain_adversarial_loss)
+
     return autoencoder_loss + semantic_loss + domain_adversarial_loss
 
   def discriminator_loss(self, generator_result_from_real, img_cartoon_dataset):
@@ -405,14 +412,19 @@ class XGAN(tf.keras.Model):
       # Generator
       gen_loss = self.generator_loss(img_cartoon_dataset, img_reals_dataset, generator_result_from_real, generator_result_from_cartoon)
 
+      self.gen_loss_metric(disc_loss)
+      self.gen_loss_metric(gen_loss)
+
       gradients_of_generator = gen_tape.gradient(gen_loss, self.generator.trainable_variables)
       gradients_of_discriminator = disc_tape.gradient(disc_loss, self.discriminator.trainable_variables)
       self.g_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
       self.d_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.trainable_variables))
 
-      self.train_loss(gen_loss)
       with self.train_summary_writer.as_default():
-        tf.summary.scalar('loss', self.train_loss.result(), step=self.epoch_step)
-        tf.summary.scalar('accuracy', self.train_accuracy.result(), step=self.epoch_step)
+        tf.summary.scalar('disc_loss', self.disc_loss_metric.result(), step=self.epoch_step)
+        tf.summary.scalar('autoencoder_loss', self.autoencoder_loss_metric.result(), step=self.epoch_step)
+        tf.summary.scalar('semantic_loss', self.semantic_loss_metric.result(), step=self.epoch_step)
+        tf.summary.scalar('domain_adversarial_loss', self.domain_adversarial_loss_metric.result(), step=self.epoch_step)
+        tf.summary.scalar('gen_loss', self.gen_loss_metric.result(), step=self.epoch_step)
       return {"Discriminator loss": disc_loss, "Generator loss": gen_loss}
 
