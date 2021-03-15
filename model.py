@@ -412,7 +412,7 @@ class XGAN(tf.keras.Model):
       # Generator
       gen_loss = self.generator_loss(img_cartoon_dataset, img_reals_dataset, generator_result_from_real, generator_result_from_cartoon)
 
-      self.gen_loss_metric(disc_loss)
+      self.disc_loss_metric(disc_loss)
       self.gen_loss_metric(gen_loss)
 
       gradients_of_generator = gen_tape.gradient(gen_loss, self.generator.trainable_variables)
