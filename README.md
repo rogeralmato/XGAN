@@ -1,3 +1,5 @@
+![progression.gif](XGAN)
+
 # XGAN
 Domain to domain translation using Generative Adversarial Networks (GANs)
 ### Installation
