@@ -1,4 +1,4 @@
-![XGAN](progression.gif)
+<img src="progression.gif" width="275" height="500"/>
 
 # XGAN
 Domain to domain translation using Generative Adversarial Networks (GANs)
